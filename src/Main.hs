@@ -2,7 +2,7 @@
 
 module Main where
 import Prelude hiding (readFile)
-import Data.ByteString.Char8
+import Data.ByteString.Char8 hiding (map)
 import Data.Attoparsec.ByteString.Char8
 import Data.Word
 import qualified Data.Scientific as Sci
@@ -68,12 +68,6 @@ buildMetricPrefixParser prefix b = do
     char prefix
     return $ adjustBase x b
 
-
--- parseMilli :: Parser Scientific
--- parseMilli = buildMetricPrefixParser 'm' (-3)
-
-
-
 adjustBase :: Scientific -> Int -> Scientific
 adjustBase x n = Sci.scientific c (b + n)
     where b = Sci.base10Exponent x
@@ -90,10 +84,27 @@ parseScientific = choice
     ,   scientific              --always put this at last|always be placed at last
     ]
 
+-- Parse and get rid of trailing space
+parseIdentifier :: Parser ByteString
+parseIdentifier = fmap pack parseIdentifierStr
+    where   parseIdentifierStr = do
+                x <- many1' (notChar ' ')
+                skipMany (char ' ')
+                return x
+-- Parse line "element" and stop at \n
+parseElement :: Parser [ByteString]
+parseElement = do
+    string "element" <?> "expect 'element'"
+    skipSpace
+    x <- manyTill parseIdentifier endOfLine <?> "banana"
+    -- x <- parseIdentifier `sepBy` skipSpace
+    return x
+
 main :: IO ()
 main = do
     content <- readFile "./data/test0"
     -- print $ parseOnly (char '.') content
     -- print $ parseOnly parseInt' "!123"
     -- print $ parseOnly parseHaha'' "..!!!...haha,haha,haha,haha"
-    print $ parseOnly parseScientific "-287.11"
+    -- print $ parseOnly parseScientific "-287.11"
+    print $ parseOnly parseElement "elenent alks    jj jj \n jdd"
