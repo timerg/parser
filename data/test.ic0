@@ -1,0 +1,29 @@
+* "simulator" "HSPICE" 
+* "version" "B-2008.09 32-BIT"
+* "format" "HSP"
+* "rundate" "16:36:08 01/03/2016 "
+* "netlist" "c:\users\timer\documents\github\hspice\op\035\subvthop_twostage\my-op_2stage.sp "
+* "runtitle" "***myop_2stage"
+* time =    0.            
+* temperature =   25.0000        
+*** BEGIN: Saved Operating Point ***                     
+.option 
++ gmindc=   1.0000p       
+.nodeset
++ 1 = 392.4538m       
++ 2 = 402.4515m       
++ b =   2.5710        
++ b0 =   2.7000        
++ b1 = 450.0000m       
++ c0 =   1.2252        
++ cn = 449.9268m       
++ cp =   2.7007        
++ vdd =   3.3000        
++ vinn =   2.0005        
++ vinp =   2.0000        
++ vo2 =   2.7634        
++ voa =   2.7705        
++ von =   2.2409        
++ vop =   1.9905        
++ vss =   0.            
+***   END: Saved Operating Point ***                     

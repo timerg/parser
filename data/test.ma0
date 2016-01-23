@@ -1,0 +1,6 @@
+$DATA1 SOURCE='HSPICE' VERSION='B-2008.09 32-BIT'
+.TITLE '***myop_2stage'
+ gain             gain1st          zerodb           phaseatdb         
+ temper           alter#            
+   63.1652          26.5331         1.110e+07       -185.0188         
+   25.0000           1.0000         

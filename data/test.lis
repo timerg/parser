@@ -1,0 +1,520 @@
+ ****** HSPICE -- B-2008.09 32-BIT (Aug 26 2008) winnt ******                   
+  Copyright (C) 2008 Synopsys, Inc. All Rights Reserved.                        
+  Unpublished-rights reserved under US copyright laws.
+  This program is protected by law and is subject to the 
+  terms and conditions of the license agreement from Synopsys.
+  Use of this program is your acceptance to be bound by the 
+  license agreement. HSPICE is the trademark of Synopsys, Inc.
+  Input File: c:\users\timer\documents\github\hspice\op\subvthop_twostage\trypol
+ Init: read install configuration file: C:\synopsys\Hspice_B-2008.09\meta.cfg
+ Init: hspice initialization file: C:\synopsys\Hspice_B-2008.09\hspice.ini
+
+
+
+
+ .option post acout=0 accurate=1 dcon=1 converge=1 gmindc=1.0000e-12 captab=1  unwrap = 1
+ *.option dccap=1 accurate=1 post
+
+ ***param***
+ .param 
+ +comon		= 0.5
+ +bias			= 0.6
+ +bias2		= 0.3
+ +supplyp	= 1.0
+ +supplyn	= 0
+ +diff			= 0
+ ***netlist***
+ ***1st stage***
+ mb	b	b0	vdd	vdd	pch	w = 10u  l = 1u	  m = 2
+ m1	1	vinn	b		b		pch	w = 30u l = 0.4u m = 2
+ m2	2	vinp	b		b		pch	w = 30u l = 0.4u m = 2
+ m5	1	b1		vss	vss	nch	w = 13u l = 0.4u m = 1
+ m6	2	b1		vss	vss	nch	w = 13u l = 0.4u m = 1
+ **low f gain = 34.5db 
+ * for subthreshold diffpair. gain do little with id. it is more related to leff and vds of output mos(about output resistance)
+ * gds is proportional to 1/leff & vds 
+ *kappa ~= 0.7     
+
+ ***2nd stage***
+ m3	von	1		vdd	vdd	pch	w = 18u    l = 1u   m = 1
+ m4	vop	2		vdd	vdd	pch w = 3.88u 	 l = 0.2u m = 1
+ m7	von	von	vss	vss	nch	w = 3.8u   l = 1u   m = 1	
+ m8	vop	von	vss	vss	nch	w = 1.1u   l = 0.2u m = 1
+
+ ***pole test***
+ *c0	vop	gnd 200n
+ *cl	von	gnd 10p
+ ***compensation***
+ c1	z1		von 400f
+ rz1	z1		1   350k	* by cal = 1/gm3. but by sweep result is around 300k~400k
+ * because this rhp zero is around the zero db corner. it effect gain under zerodb but effect phase above zerodb.
+ *	so when this rhp zero become lhp. we can make it very large to gain pm
+ c2	2			vop 900f  * around 900f has smallest bandwidth
+ *rz2	z2	2   10000
+
+ *cl1	1	gnd 400f
+ *cl2	2	gnd 400f
+ *cb	b		gnd 600f			*use here to cancell right hand zero
+ *clp	von	gnd 500f
+
+
+ cout	vop gnd 200n
+ *rl	vop 	gnd 1x
+
+ ***source***
+ vd		vdd 	gnd dc supplyp
+ vs		vss 	gnd dc supplyn
+ vb 		b0		gnd dc bias
+ vb1		b1		gnd dc bias2
+
+
+ ***input***
+ vinp vinp gnd dc = 'comon+diff' ac = 1
+ vinn vinn gnd dc = 'comon-diff' *ac = 1 -180
+
+
+
+
+
+
+ ***test
+ *mt	vdt	vgt	vss	vss	nch	w = 2.7u   l = 0.5u m = 1
+ mt	vdt	vgt	vdd	vdd	pch w = 9.7u l = 0.5u m = 1
+
+ vtd	vdt	gnd dc = '1-499.7048m'
+ vtg	vgt	gnd dc = '1-397.6836m'
+
+
+
+
+
+
+
+ .op
+
+ ***sweep***
+ .dc diff -0.5 0.5 0.01
+ ***probe&measuring***
+ .ac dec 100 0.1 10g
+ .tf v(1) vinp
+ .pz v(vop) vinp
+ .probe dc i(m1) i(m2)	i(mt)
+ .probe ac cap(von)
+ +gain1st=par('vdb(2, 1)-vdb(vinp,vinn)')	par('i(m1)-i(m2)')	phase1st=par('vp(2,1)')
+ +gainall=par('vdb(vop)-vdb(vinp,vinn)')		phaseall=par('vp(vop)')
+ .meas ac gain max (par('vdb(vop)-vdb(vinp,vinn)'))
+ .meas ac bandwidth when par('vdb(vop)-vdb(vinp,vinn)') = 'gain-3db'
+ .meas ac zerodb when par('vdb(vop)-vdb(vinp,vinn)') = 1
+ .meas ac phaseatdb	find par('vp(vop)') when par('vdb(vop)-vdb(vinp,vinn)') = 1
+
+
+
+
+ .end
+
+
+ **warning**  the accurate option increases  the cpu time but the results
+                are more accurate.
+ ***accurate option sets default value of the options: 
+ lvltim= 4         dvdt= 3       relvar= 200.00m absvar= 200.00m
+     ft= 200.00m relmos=  10.00m
+ (used for FFT control ) fft_accurate= 1
+ 
+
+ 
+      
+
+
+
+
+ ****     small-signal transfer characteristics
+
+        diff       input resistance at vinp      output resistance at v(1)        v(1)/vinp     
+
+    -500.0000m           1.000e+20                     117.4381k                   55.9701p
+    -490.0000m           1.000e+20                     117.4412k                   79.1412p
+    -480.0000m           1.000e+20                     117.4454k                  112.0258p
+    -470.0000m           1.000e+20                     117.4511k                  158.7334p
+    -460.0000m           1.000e+20                     117.4588k                  225.1279p
+    -450.0000m           1.000e+20                     117.4693k                  319.5837p
+    -440.0000m           1.000e+20                     117.4836k                  454.0706p
+    -430.0000m           1.000e+20                     117.5031k                  645.7120p
+    -420.0000m           1.000e+20                     117.5294k                  919.0233p
+    -410.0000m           1.000e+20                     117.5652k                    1.3091n
+    -400.0000m           1.000e+20                     117.6138k                    1.8664n
+    -390.0000m           1.000e+20                     117.6797k                    2.6632n
+    -380.0000m           1.000e+20                     117.7691k                    3.8032n
+    -370.0000m           1.000e+20                     117.8903k                    5.4359n
+    -360.0000m           1.000e+20                     118.0544k                    7.7761n
+    -350.0000m           1.000e+20                     118.2768k                   11.1331n
+    -340.0000m           1.000e+20                     118.5778k                   15.9532n
+    -330.0000m           1.000e+20                     118.9852k                   22.8809n
+    -320.0000m           1.000e+20                     119.5364k                   32.8489n
+    -310.0000m           1.000e+20                     120.2819k                   47.2108n
+    -300.0000m           1.000e+20                     121.2903k                   67.9391n
+    -290.0000m           1.000e+20                     122.6552k                   97.9256n
+    -280.0000m           1.000e+20                     124.5041k                  141.4450n
+    -270.0000m           1.000e+20                     127.0134k                  204.8963n
+    -260.0000m           1.000e+20                     130.4298k                  298.0230n
+    -250.0000m           1.000e+20                     135.1047k                  436.0135n
+    -240.0000m           1.000e+20                     141.5505k                  643.2821n
+    -230.0000m           1.000e+20                     150.5385k                  960.6139n
+    -220.0000m           1.000e+20                     163.2762k                    1.4594u
+    -210.0000m           1.000e+20                     181.7437k                    2.2714u
+    -200.0000m           1.000e+20                     209.3660k                    3.6550u
+    -190.0000m           1.000e+20                     252.4270k                    6.1518u
+    -180.0000m           1.000e+20                     323.1990k                   10.9823u
+    -170.0000m           1.000e+20                     447.2074k                   21.1222u
+    -160.0000m           1.000e+20                     680.5656k                   44.4400u
+    -150.0000m           1.000e+20                       1.1486x                  103.0986u
+    -140.0000m           1.000e+20                       2.0963x                  257.8877u
+    -130.0000m           1.000e+20                       3.7635x                  636.1773u
+    -120.0000m           1.000e+20                       5.8939x                    1.3807m
+    -110.0000m           1.000e+20                       7.8695x                    2.5903m
+    -100.0000m           1.000e+20                       9.4224x                    4.4359m
+     -90.0000m           1.000e+20                      10.5907x                    7.2802m
+     -80.0000m           1.000e+20                      11.4754x                   11.7850m
+     -70.0000m           1.000e+20                      12.1603x                   19.1351m
+     -60.0000m           1.000e+20                      12.7046x                   31.5112m
+     -50.0000m           1.000e+20                      13.1483x                   53.1356m
+     -40.0000m           1.000e+20                      13.5192x                   92.7910m
+     -30.0000m           1.000e+20                      13.8367x                  171.4886m
+     -20.0000m           1.000e+20                      14.1145x                  355.6018m
+     -10.0000m           1.000e+20                      14.3382x                    1.0562 
+       0.                1.000e+20                      11.0919x                   24.0316 
+      10.0000m           1.000e+20                     728.2557k                    2.0795 
+      20.0000m           1.000e+20                     417.7285k                    1.3416 
+      30.0000m           1.000e+20                     332.4975k                    1.1439 
+      40.0000m           1.000e+20                     293.1308k                    1.0568 
+      50.0000m           1.000e+20                     270.7427k                    1.0109 
+      60.0000m           1.000e+20                     255.9191k                  983.7697m
+      70.0000m           1.000e+20                     244.5271k                  965.8103m
+      80.0000m           1.000e+20                     234.3507k                  952.1110m
+      90.0000m           1.000e+20                     223.9394k                  939.8607m
+     100.0000m           1.000e+20                     212.1373k                  927.2134m
+     110.0000m           1.000e+20                     197.9979k                  912.8048m
+     120.0000m           1.000e+20                     181.3290k                  895.3569m
+     130.0000m           1.000e+20                     164.2060k                  872.4154m
+     140.0000m           1.000e+20                     150.5584k                  838.5857m
+     150.0000m           1.000e+20                     141.1799k                  788.2840m
+     160.0000m           1.000e+20                     133.8878k                  720.3663m
+     170.0000m           1.000e+20                     127.2429k                  638.8138m
+     180.0000m           1.000e+20                     121.0752k                  551.0044m
+     190.0000m           1.000e+20                     115.6901k                  464.4526m
+     200.0000m           1.000e+20                     111.3140k                  384.3582m
+     210.0000m           1.000e+20                     107.9593k                  313.2949m
+     220.0000m           1.000e+20                     105.4942k                  252.0306m
+     230.0000m           1.000e+20                     103.7365k                  200.3473m
+     240.0000m           1.000e+20                     102.5092k                  157.5356m
+     250.0000m           1.000e+20                     101.6646k                  122.6494m
+     260.0000m           1.000e+20                     101.0886k                   94.6444m
+     270.0000m           1.000e+20                     100.6976k                   72.4659m
+     280.0000m           1.000e+20                     100.4320k                   55.1117m
+     290.0000m           1.000e+20                     100.2509k                   41.6739m
+     300.0000m           1.000e+20                     100.1263k                   31.3611m
+     310.0000m           1.000e+20                     100.0395k                   23.5059m
+     320.0000m           1.000e+20                      99.9783k                   17.5598m
+     330.0000m           1.000e+20                      99.9341k                   13.0821m
+     340.0000m           1.000e+20                      99.9015k                    9.7244m
+     350.0000m           1.000e+20                      99.8768k                    7.2151m
+     360.0000m           1.000e+20                      99.8577k                    5.3453m
+     370.0000m           1.000e+20                      99.8424k                    3.9551m
+     380.0000m           1.000e+20                      99.8299k                    2.9234m
+     390.0000m           1.000e+20                      99.8194k                    2.1591m
+     400.0000m           1.000e+20                      99.8104k                    1.5934m
+     410.0000m           1.000e+20                      99.8025k                    1.1753m
+     420.0000m           1.000e+20                      99.7955k                  866.4705u
+     430.0000m           1.000e+20                      99.7891k                  638.5304u
+     440.0000m           1.000e+20                      99.7833k                  470.3941u
+     450.0000m           1.000e+20                      99.7779k                  346.4323u
+     460.0000m           1.000e+20                      99.7729k                  255.0766u
+     470.0000m           1.000e+20                      99.7682k                  187.7738u
+     480.0000m           1.000e+20                      99.7638k                  138.2054u
+     490.0000m           1.000e+20                      99.7596k                  101.7073u
+     500.0000m           1.000e+20                      99.7556k                   74.8387u
+  
+  *** initial damped pseudo transient completed. ***
+  *** final try started ***
+1****** HSPICE -- B-2008.09 32-BIT (Aug 26 2008) winnt ******                   
+ ******  
+ ***myop_2stage
+
+  ******  operating point information tnom=  25.000 temp=  25.000 *****
+ ***** operating point status is all       simulation time is     0.     
+    node    =voltage      node    =voltage      node    =voltage
+
+ +0:1       = 602.3164m 0:2       = 602.3164m 0:b       = 797.6803m
+ +0:b0      = 600.0000m 0:b1      = 300.0000m 0:vdd     =   1.0000 
+ +0:vdt     = 500.2952m 0:vgt     = 602.3164m 0:vinn    = 500.0000m
+ +0:vinp    = 500.0000m 0:von     = 398.2605m 0:vop     = 499.1139m
+ +0:vss     =   0.      0:z1      = 602.3164m
+
+
+ maximum nodal capacitance=   2.000E-07         on node     0:vop             
+
+    nodal  capacitance table 
+
+    node    =    cap      node    =    cap      node    =    cap
+
+ +0:1       = 148.9283f 0:2       =   1.0009p 0:b       = 553.2191f
+ +0:b0      =  58.6118f 0:b1      =  37.9046f 0:vdd     = 297.4422f
+ +0:vdt     =  12.4334f 0:vgt     =  16.9182f 0:vinn    =  84.7992f
+ +0:vinp    =  84.7992f 0:von     = 438.5762f 0:vop     = 200.0009n
+ +0:vss     = 122.2360f 0:z1      = 400.0000f
+
+ 
+
+ ****  voltage sources
+
+ subckt                                                                    
+ element  0:vd       0:vs       0:vb       0:vb1      0:vinp     0:vinn    
+  volts      1.0000     0.       600.0000m  300.0000m  500.0000m  500.0000m
+  current   -1.8753u    1.3927u    0.         0.         0.         0.     
+  power      1.8753u    0.         0.         0.         0.         0.     
+
+ subckt                        
+ element  0:vtd      0:vtg     
+  volts    500.2952m  602.3164m
+  current  482.6595n    0.     
+  power   -241.4722n    0.     
+
+     total voltage source power dissipation=    1.6339u       watts
+
+
+
+ **** resistors
+
+ subckt             
+ element  0:rz1     
+  r value  350.0000k
+  v drop     0.     
+  current    0.     
+  power      0.     
+
+
+
+ **** mosfets
+
+
+ subckt                                                                    
+ element  0:mb       0:m1       0:m2       0:m5       0:m6       0:m3      
+ model    0:pch.3    0:pch.4    0:pch.4    0:nch.4    0:nch.4    0:pch.3   
+ region       Cutoff     Cutoff     Cutoff     Cutoff     Cutoff     Cutoff
+  id      -554.8338n -277.4165n -277.4165n  277.4161n  277.4161n -493.0952n
+  ibs      8.073e-23  3.937e-23  3.937e-23 -4.595e-23 -4.595e-23  7.057e-23
+  ibd       51.9013a  151.8448a  151.8448a -109.6160a -109.6161a   45.9632a
+  vgs     -400.0000m -297.6803m -297.6803m  300.0000m  300.0000m -397.6836m
+  vds     -202.3197m -195.3639m -195.3639m  602.3164m  602.3164m -601.7395m
+  vbs        0.         0.         0.         0.         0.         0.     
+  vth     -458.7427m -471.6914m -471.6914m  491.0346m  491.0346m -458.6506m
+  vdsat    -51.3038m  -41.5024m  -41.5024m   43.9133m   43.9133m  -50.8522m
+  vod       58.7427m  174.0112m  174.0112m -191.0346m -191.0346m   60.9670m
+  beta       1.4883m   11.7361m   11.7361m   15.0987m   15.0987m    1.3403m
+  gam eff  497.9476m  541.3676m  541.3676m  556.1233m  556.1233m  497.9476m
+  gm        12.4562u    7.4898u    7.4898u    7.5284u    7.5284u   11.1012u
+  gds       79.5039n   90.5815n   90.5815n   63.2817n   63.2817n   42.3096n
+  gmb        4.0970u    2.5201u    2.5201u    2.1702u    2.1702u    3.6530u
+  cdtot     27.5780f   82.0616f   82.0616f   14.6894f   14.6894f   22.4594f
+  cgtot     58.6118f   84.7992f   84.7992f   18.9523f   18.9523f   52.1773f
+  cstot     44.8448f   87.8163f   87.8163f   17.2107f   17.2107f   39.4012f
+  cbtot     80.8327f  175.0043f  175.0043f   31.6652f   31.6652f   70.1791f
+  cgs       18.8854f   20.1830f   20.1830f    4.8321f    4.8321f   16.2851f
+  cgd        6.5675f   19.6732f   19.6732f    4.7623f    4.7623f    5.8996f
+
+
+
+ subckt                                              
+ element  0:m4       0:m7       0:m8       0:mt      
+ model    0:pch.8    0:nch.7    0:nch.12   0:pch.7   
+ region       Cutoff     Cutoff     Cutoff     Cutoff
+  id      -344.7539n  493.0956n  344.7539n -482.6585n
+  ibs      5.309e-23 -8.732e-23 -7.472e-23  7.031e-23
+  ibd       10.6618a  -12.7121a   -5.1326a   25.2126a
+  vgs     -397.6836m  398.2605m  398.2605m -397.6836m
+  vds     -500.8861m  398.2605m  499.1139m -499.7048m
+  vbs        0.         0.         0.         0.     
+  vth     -501.1172m  483.5634m  531.4831m -466.4427m
+  vdsat    -46.6159m   58.0195m   44.4128m  -49.7222m
+  vod      103.4336m  -85.3029m -133.2226m   68.7591m
+  beta       1.8245m    1.5707m    2.8883m    1.4591m
+  gam eff  646.5385m  519.2085m  922.4594m  524.0796m
+  gm         7.9945u   10.7377u    8.0808u   10.8815u
+  gds      152.6038n   49.8330n  191.2066n   79.7485n
+  gmb        2.7212u    3.1117u    2.4456u    3.6001u
+  cdtot      5.0702f    4.5763f    1.3991f   12.4334f
+  cgtot      4.1019f   10.2686f    1.2719f   16.9182f
+  cstot      6.0064f    6.4930f    1.6204f   17.1659f
+  cbtot      9.7895f   13.7213f    2.6494f   29.2225f
+  cgs        1.4336f    2.3860f  420.1436a    5.5613f
+  cgd        1.2682f    1.3906f  400.9168a    3.1780f
+
+
+
+
+
+
+
+ ****     small-signal transfer characteristics
+
+      v(1)/vinp                                =   24.0316 
+      input resistance at             vinp     =  1.000e+20
+      output resistance at v(1)                =   11.0919x
+
+
+
+ ***************************************************
+   ******   pole/zero analysis  
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ **warning** underflow 1 time(s) in pole/zero analysis
+ 
+ 
+    input =  0:vinp          output = v(vop)
+ 
+       poles (rad/sec)                 poles ( hertz)
+ real            imag            real            imag            
+ -1.71864        0.              -273.529m       0.              
+ -68.7786k       0.              -10.9465k       0.              
+ -154.764k       0.              -24.6315k       0.              
+ -43.5249x       15.6028x        -6.92720x       2.48327x        
+ -43.5249x       -15.6028x       -6.92720x       -2.48327x       
+ -379.975x       0.              -60.4749x       0.              
+ 
+       zeros (rad/sec)                 zeros ( hertz)
+ real            imag            real            imag            
+ -68.7621k       -7.55309        -10.9438k       -1.20211        
+ -31.2375x       -206.216        -4.97161x       -32.8203        
+ -40.4896x       0.              -6.44411x       0.              
+ 50.2041x        -280.951        7.99023x        -44.7148        
+ 65.1327x        0.              10.3662x        0.              
+ -370.497x       0.              -58.9665x       0.              
+ 
+  ***** constant factor = 1.60813n
+ ******  
+ ***myop_2stage
+
+  ******  ac analysis tnom=  25.000 temp=  25.000 *****
+   gain=  6.0685E+01    at=  1.0000E-01
+               from=  1.0000E-01    to=  1.0000E+10
+   bandwidth=  2.0640E-01
+   zerodb=  2.8085E+02
+   phaseatdb= -9.0599E+01
+
+          ***** job concluded
+1****** HSPICE -- B-2008.09 32-BIT (Aug 26 2008) winnt ******                   
+ ******  
+ ***myop_2stage
+
+  ******  job statistics summary tnom=  25.000 temp=  25.000 *****
+
+  ******  HSPICE Threads Information  ******
+  Command Line Threads Count:                      0
+  Available CPU Count:                             4
+  Actual Model Evaluation(Load) Threads Count:     1
+  Actual Solver Threads Count:                     1
+
+
+  ******  Circuit Statistics  ******
+  # nodes       =      38  # elements   =      25
+  # resistors   =       1  # capacitors =       3  # inductors   =       0
+  # mutual_inds =       0  # vccs       =       0  # vcvs        =       0
+  # cccs        =       0  # ccvs       =       0  # volt_srcs   =      11
+  # curr_srcs   =       0  # diodes     =       0  # bjts        =       0
+  # jfets       =       0  # mosfets    =      10  # U elements  =       0
+  # T elements  =       0  # W elements =       0  # B elements  =       0
+  # S elements  =       0  # P elements =       0  # va device   =       0
+
+
+  ******  Runtime Statistics (seconds)  ******
+
+  analysis           time    # points   tot. iter  conv.iter
+  op point           0.03           1          72
+  dc sweep           0.06         101         309
+  ac analysis        0.10        1101        1101
+  readin             0.20
+  errchk             0.02
+  setup              0.01
+  output             0.00
+
+
+           total memory used          393  kbytes
+           total cpu time            0.49 seconds
+           total elapsed time           1 seconds
+           job started at     15:40:15 12/09/2015
+           job ended   at     15:40:15 12/09/2015
+
+
+ Init: hspice initialization file: C:\synopsys\Hspice_B-2008.09\hspice.ini
