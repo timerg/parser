@@ -8,7 +8,7 @@ import Data.Scientific (Scientific)
 
 --
 ----
-data Model = Model ByteString ByteString [(ByteString, Parameter)]
+data Model = Model ByteString ByteString [Parameter]
     deriving (Show)
 
 modelName :: Model -> ByteString
@@ -17,12 +17,14 @@ modelName (Model name _ _) = name
 modelType :: Model -> ByteString
 modelType (Model _ mtype _) = mtype
 
-modelContent :: Model -> [(ByteString, Parameter)]
+modelContent :: Model -> [Parameter]
 modelContent (Model _ _ content) = content
 ----
-data Parameter = Numerical Scientific | Expression ByteString
+data Value = Numerical Scientific | Expression ByteString
     deriving (Show)
 
+data Parameter = Parameter ByteString Value
+    deriving (Show)
 --
 parseParamName :: Parser ByteString
 parseParamName = fmap pack $ do
@@ -30,19 +32,19 @@ parseParamName = fmap pack $ do
                 skipMany (char ' ')
                 return x
 
-parseParamLine :: Parser [(ByteString, Parameter)]
+parseParamLine :: Parser [Parameter]
 parseParamLine = do
     stringCI ".param"    <?> "expected '.param'"
     x <- parseParams
     return x
 
-parseParams :: Parser [(ByteString, Parameter)]
+parseParams :: Parser [Parameter]
 parseParams = many1' $ do
         skipMany (satisfy $ \c -> isSpace c || c == '\n' || c == '+')
         param <- parseParam
         return param
 
-parseParam :: Parser (ByteString, Parameter)
+parseParam :: Parser Parameter
 parseParam = do
     x <- parseParamName
     char '='
@@ -51,7 +53,7 @@ parseParam = do
         [   fmap Numerical parseScientific
         ,   fmap Expression parseParamName
         ]
-    return (x, y)
+    return $ Parameter x y
 
 parseModel :: Parser Model
 parseModel = do
@@ -63,7 +65,7 @@ parseModel = do
     skipSpace
     char '('                    <?> "expected a opening bracket"
     skipSpace
-    mContent <- parseParams     <?> "expected a lot of Parameters"
+    mContent <- parseParams     <?> "expected a lot of Values"
     skipSpace
     char ')'                    <?> "expected a closing bracket"
     return $ Model mName mType mContent

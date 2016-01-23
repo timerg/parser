@@ -99,3 +99,9 @@ parseIdentifier = fmap pack $ do
                 x <- many1' (notChar ' ')
                 skipMany (char ' ')
                 return x
+
+parseComment :: Parser ByteString
+parseComment = do
+                char '*'
+                x <- takeTill $ \c -> c == '\n'
+                return x
