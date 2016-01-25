@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
-import Prelude hiding (readFile, putStrLn)
-import Data.ByteString.Char8 hiding (map)
+import Prelude hiding (readFile, putStrLn, putStr, concat)
+import Data.ByteString.Char8 hiding (map, head, last, length)
 import Data.Attoparsec.ByteString.Char8
 import Data.Scientific (Scientific)
 import Parser.TechFile
@@ -51,12 +51,22 @@ main = do
     -- print $ parseOnly parseScientific "0.1a"
     -- print $ parseOnly (buildValueParser "id") "id      -554.8338n -277.4165n -277.4165n  277.4161n  277.4161n -493.0952n \n"
     -- print $ parseOnly (buildAttributeParser "model") "  model    0:pch.3    0:pch.4    0:pch.4    0:nch.4    0:nch.4    0:pch.3 \n"
-    -- print $ parseOnly parseModel content
-    let result = parseOnly parseModel content
-    case result of
-        Left err    -> putStrLn $ pack err
-        Right model -> putStrLn $ serialize model
-    -- print $ serialize result
+
+    -- let content = "banana\n* 1 \n* 2 \nbanana\n"
+    -- let test = string "banana\n" `sepBy` many' parseComment
+    -- print $ parseOnly test content
+    -- parseTest test content
+    parseTest parseMosLib content
+
+    -- let result = parseOnly parseModels content
+    -- case result of
+    --     Left err    -> putStrLn $ pack err
+    --     Right model -> do
+    --         let serializedModels = map julialize model
+    --         mapM_ putStrLn serializedModels
+    --         -- putStrLn $ pack . show $ serializedModels
+    --         parseTest parseModels content
+    -- print $ fmap serialize result
     return ()
 
     -- parseTest parseParams content

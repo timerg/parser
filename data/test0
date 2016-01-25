@@ -1,3 +1,11 @@
+.LIB MOS
+*
+***************************************************************
+*                                                             *
+*               3.3V NMOS DEVICES MODEL                       *
+*                                                             *
+***************************************************************
+
 .MODEL pch.6            PMOS   (                    LMIN     = 3.5E-07
 +LMAX    = '8.228E-07-dxl' WMIN    = '7.823E-07-dxw' WMAX    = '1.1823E-06-dxw'
 +LEVEL   = 49             TNOM     = 25             VERSION  = 3.1
@@ -63,3 +71,74 @@
 +NQSMOD  = 0              XPART    = 1              CF       = 0
 +NLEV    = 3              AF       = 1.0            KF       = 3.5E-24
 +CALCACM = 1              SFVTFLAG = 0              VFBFLAG  = 1         )
+** asdsasdas
+** asd
+.MODEL nch.4             NMOS   (                    LMIN    = '1.207E-06-dxl'
++LMAX    = 2.01E-05        WMIN    = '7.83E-07-dxw'  WMAX    = '1.183E-06-dxw'
++LEVEL   = 49              TNOM    = 25              VERSION = 3.1
++ACM     = 12              LDIF    = 1.2E-07         HDIF    = hdifn
++RSH     = 82.2            RD      = 0               RS      = 0
++TOX     = toxn            XJ      = 1E-07           NCH     = 2.3579E+17
++LLN     = 1               LWN     = 1               WLN     = 1
++WWN     = 1               LINT    = 4E-08           LL      = 0
++LW      = 0               LWL     = 0               WINT    = 4E-08
++WL      = 0               WW      = 0               WWL     = 0
++MOBMOD  = 1               BINUNIT = 2               XL      = '3E-08+dxl'
++XW      = '1.5E-07+dxw'   DWG     = 0               DWB     = 0
++VTH0    = 'dvtn+0.528243' LVTH0   = 1.080427E-08    WVTH0   = -1.156297E-08
++PVTH0   = 8.55473E-15     K1      = 0.4545522       LK1     = 3.322464E-08
++WK1     = 3.753591E-08    PK1     = -4.005616E-14   K2      = 0.02647978
++LK2     = 7.992918E-09    WK2     = 6.561244E-09    PK2     = -1.48315E-14
++K3      = 0               DVT0    = 0               DVT1    = 0
++DVT2    = 0               DVT0W   = 0               DVT1W   = 0
++DVT2W   = 0               NLX     = 0               W0      = 0
++K3B     = 0               VSAT    = 96507.23        UA      = -7.217974E-10
++LUA     = 8.351195E-16    WUA     = 3.036106E-16    PUA     = -3.512775E-22
++UB      = 2.902607E-18    LUB     = -1.401372E-24   WUB     = -1.018808E-24
++PUB     = 7.304723E-31    UC      = 7.178552E-11    LUC     = -2.088186E-17
++WUC     = -4.563875E-17   PUC     = 1.122583E-23    RDSW    = 750
++PRWB    = 0               PRWG    = 0               WR      = 1
++U0      = 0.03723282      LU0     = -2.798723E-09   WU0     = -4.527918E-09
++PU0     = 6.28339E-15     A0      = 1.848904        LA0     = -5.194055E-07
++WA0     = -1.026417E-06   PA0     = 8.245877E-13    KETA    = 0.01166675
++LKETA   = -2.805299E-09   WKETA   = -5.86025E-10    PKETA   = 2.598561E-15
++A1      = 0               A2      = 0.99            AGS     = 0.7010739
++LAGS    = -4.640424E-07   WAGS    = -5.956526E-07   PAGS    = 6.8917E-13
++B0      = 0               B1      = 0               VOFF    = -0.1212307
++LVOFF   = 2.456386E-08    NFACTOR = 0.8705778       LNFACTOR= -1.828959E-08
++WNFACTOR= -6.481431E-08   PNFACTOR= 4.740038E-14    CIT     = 0.0002549786
++LCIT    = -4.391399E-11   WCIT    = 5.092893E-11    PCIT    = -7.546486E-18
++CDSC    = 0               CDSCB   = 0               CDSCD   = 0
++ETA0    = -8.412339E-05   LETA0   = 1.002234E-09    WETA0   = 1.585833E-10
++PETA0   = -3.047557E-16   ETAB    = -3.010733E-05   LETAB   = 1.752946E-10
++WETAB   = 3.772446E-11    PETAB   = -2.19644E-16    DSUB    = 0
++PCLM    = 0.1692336       LPCLM   = 6.140966E-07    PDIBLC1 = 1E-05
++PDIBLC2 = -0.000347682    LPDIBLC2= 1.437708E-09    WPDIBLC2= 2.938791E-10
++PPDIBLC2= 1.418466E-15    PDIBLCB = 0.1387533       DROUT   = 0
++PSCBE1  = 3.519534E+08    LPSCBE1 = -125.1231       WPSCBE1 = 76.38679
++PPSCBE1 = 7.977505E-05    PSCBE2  = -8.737216E-05   LPSCBE2 = 9.863835E-11
++WPSCBE2 = 1.596661E-10    PPSCBE2 = -1.782013E-16   PVAG    = 0
++DELTA   = 0.01            ALPHA0  = 2.5E-06         BETA0   = 20.7
++KT1     = -0.1499315      LKT1    = -2.115566E-09   WKT1    = -1.223785E-07
++PKT1    = 4.266289E-14    KT2     = -0.02087417     LKT2    = 5.041189E-08
++WKT2    = 2.442399E-09    PKT2    = -4.761794E-14   AT      = -21673.44
++LAT     = 0.006954652     WAT     = 0.02754232      PAT     = -1.640881E-08
++UTE     = -2.565965       LUTE    = 5.17659E-07     WUTE    = 1.094306E-06
++PUTE    = -8.332978E-13   UA1     = -1.6811E-09     LUA1    = 1.19284E-15
++WUA1    = 3.254065E-15    PUA1    = -3.143271E-21   UB1     = -1.065109E-18
++LUB1    = -2.464934E-25   WUB1    = -1.331515E-24   PUB1    = 2.754072E-30
++UC1     = -8.220291E-11   LUC1    = -3.608129E-17   WUC1    = 7.412109E-18
++PUC1    = 1.09683E-22     KT1L    = 0               PRT     = -1223.895
++LPRT    = 0.0009821714    WPRT    = 0.001063665     PPRT    = -1.230661E-09
++CJ      = cjn            CJSW     = cjswn          CJSWG    = cjswgn
++MJ      = 0.3297355      MJSW     = 0.1303453      MJSWG    = 0.1303453
++PB      = 0.6944804      PBSW     = 0.6944804      PBSWG    = 0.6944804
++CTA     = 9.42521E-4     CTP      = 4.91382E-04    PTA      = 1.485657E-03
++PTP     = 1.485657E-03   CGDO     = cgon           CGSO     = cgon
++XTI     = 3              N        = 1              CAPMOD   = 0
++NQSMOD  = 0              XPART    = 1              CF       = 0
++CALCACM = 1              SFVTFLAG = 0              VFBFLAG  = 1
++NLEV    = 3              AF       = 0.85           KF       = 1.0E-24
++JS      = 6.27496E-05    JSW      = 5.79847E-10          )
+*
+.ENDL MOS

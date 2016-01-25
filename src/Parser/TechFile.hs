@@ -68,4 +68,22 @@ parseModel = do
     mContent <- parseParams     <?> "expected a lot of Values"
     skipSpace
     char ')'                    <?> "expected a closing bracket"
+    skipSpace
     return $ Model mName mType mContent
+
+parseModels :: Parser [Model]
+parseModels = do
+    x <- parseModel `sepBy` many' parseComment
+    -- x <- many1' parseModel
+    return x
+
+parseMosLib :: Parser ()
+parseMosLib = do
+    stringCI ".lib Mos"
+    skipMany $ satisfy $ \c -> isSpace c || c == '\n' || c == '+'
+    pu <- many' parseComment
+    x <- parseModels
+    pu <- many' parseComment
+    stringCI ".ENDL MOS"
+    endOfLine
+    return ()

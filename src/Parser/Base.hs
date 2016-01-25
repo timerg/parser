@@ -100,8 +100,10 @@ parseIdentifier = fmap pack $ do
                 skipMany (char ' ')
                 return x
 
-parseComment :: Parser ByteString
+parseComment :: Parser ()
 parseComment = do
+                skipSpace
                 char '*'
-                x <- takeTill $ \c -> c == '\n'
-                return x
+                takeTill $ \c -> c == '\n'
+                char '\n'
+                return ()
